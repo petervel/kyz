@@ -13,7 +13,11 @@ import { RouterView } from 'vue-router'
 <style scoped>
 header {
   line-height: 1.5;
-  font-size: 3rem;
+  font-size: 2rem;
   max-height: 100vh;
+  background: #e9c46a;
+  color: #333;
+  padding-inline: 1rem;
+  box-shadow: 1px 3px 10px 0px rgba(0, 0, 0, 0.3);
 }
 </style>

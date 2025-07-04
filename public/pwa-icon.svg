@@ -1,7 +1,12 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="100%" height="100%" viewBox="0 0 512 512" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1.058,0,0,0.957778,-1.78045,-1.81265)">
-        <ellipse cx="243.62" cy="268.863" rx="241.304" ry="266.128" style="fill:rgb(81,94,204);"/>
-    </g>
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" rx="40" fill="#111" />
+  
+  <!-- Background circles (fingers) -->
+  <circle cx="60" cy="60" r="20" fill="#e63946" />
+  <circle cx="140" cy="60" r="20" fill="#457b9d" />
+  <circle cx="60" cy="140" r="20" fill="#2a9d8f" />
+  <circle cx="140" cy="140" r="20" fill="#f4a261" />
+  
+  <!-- Highlighted chosen finger (purple) -->
+  <circle cx="100" cy="100" r="35" fill="#e9c46a" stroke="#fff" stroke-width="5" />
 </svg>
