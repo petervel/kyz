@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import FingerCircle from "../components/FingerCircle.vue"
 import { getHue, releaseHue, type ColourCode } from '../components/hue'
 
@@ -12,7 +12,7 @@ interface Finger {
 
 const fingers = ref<Finger[]>([])
 
-const TESTING = true
+const TESTING = false
 if (TESTING) {
   fingers.value.push({
     x: 120,
@@ -24,20 +24,24 @@ if (TESTING) {
 
 
 const winnerIdentifier = ref<number | undefined>()
+const winner = computed(() => {
+  if (winnerIdentifier.value == undefined) return undefined;
+  return fingers.value.find(f => f.identifier == winnerIdentifier.value)
+})
 
 let timeout: ReturnType<typeof setTimeout> | null = null
 
 const resetTimer = () => {
   if (timeout) clearTimeout(timeout)
+
   if (fingers.value.length >= 2) {
+    winnerIdentifier.value = undefined
     timeout = setTimeout(() => {
       const winnerIndex = Math.floor(Math.random() * fingers.value.length)
       winnerIdentifier.value = fingers.value[winnerIndex].identifier
-      console.log("WINNER", winnerIdentifier.value)
-    }, 500)
+    }, 3000)
   }
 }
-
 
 const startTouch = (evt: TouchEvent) => {
   for (const touch of evt.changedTouches) {
@@ -82,7 +86,7 @@ window.addEventListener('touchend', endTouch, { passive: false })
 </script>
 
 <template>
-  <main>
+  <main :style="{ backgroundColor: winner ? winner.colourCode.colour : 'unset' }">
     <FingerCircle v-for="finger in fingers" :x="finger.x" :y="finger.y" :colour="finger.colourCode.colour"
       :identifier="finger.identifier" :winner="winnerIdentifier" v-bind:key="finger.identifier" />
   </main>
@@ -91,6 +95,6 @@ window.addEventListener('touchend', endTouch, { passive: false })
 <style lang="css" scoped>
 main {
   flex: 1;
-  color: yellow;
+  transition: background-color 300ms ease;
 }
 </style>
