@@ -14,7 +14,7 @@ const status = computed(() => {
   <div class="container" :class="status" :style="{ left: `${x}px`, top: `${y}px` }">
     <div class="circle" :style="{ borderColor: colour }">
       <div class="inner" :style="{ backgroundColor: colour }"></div>
-      <div class="circle-animation"></div>
+      <div class="circle-animation" v-if="status == 'won'"></div>
     </div>
   </div>
 </template>
@@ -63,7 +63,7 @@ const status = computed(() => {
   opacity: 1;
   color: black;
   position: absolute;
-  transform: scale(10);
+  transform: scale(2);
   transition: transform var(--animation-time) ease-out, opacity var(--animation-time) ease;
 }
 
