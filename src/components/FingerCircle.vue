@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 
 const { x, y, colour, identifier, winner } = defineProps(["x", "y", "colour", "identifier", "winner"])
@@ -8,13 +8,24 @@ const status = computed(() => {
   if (winner == undefined) return "playing";
   return (winner == identifier) ? "won" : "lost"
 })
+
+const animating = ref(false);
+
+watch(status, (newStatus) => {
+  if (newStatus === "won") {
+    animating.value = true;
+    setTimeout(() => {
+      animating.value = false;
+    }, 300); // match --animation-time
+  }
+});
 </script>
 
 <template>
   <div class="container" :class="status" :style="{ left: `${x}px`, top: `${y}px` }">
     <div class="circle" :style="{ borderColor: colour }">
       <div class="inner" :style="{ backgroundColor: colour }"></div>
-      <div class="circle-animation" v-if="status == 'won'"></div>
+      <div class="circle-animation" :class="{ animating }"></div>
     </div>
   </div>
 </template>
@@ -60,16 +71,16 @@ const status = computed(() => {
   border-color: black;
   width: 100%;
   height: 100%;
-  opacity: 1;
+  opacity: 0;
   color: black;
   position: absolute;
-  transform: scale(2);
+  transform: scale(1);
   transition: transform var(--animation-time) ease-out, opacity var(--animation-time) ease;
 }
 
-.won .circle-animation {
-  opacity: 0;
-  transform: scale(1);
+.circle-animation.animating {
+  opacity: 1;
+  transform: scale(5);
 }
 
 .won .circle .inner {

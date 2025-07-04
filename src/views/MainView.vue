@@ -11,19 +11,8 @@ interface Finger {
 }
 
 const fingers = ref<Finger[]>([])
-
-const TESTING = true
-if (TESTING) {
-  fingers.value.push({
-    x: 120,
-    y: 120,
-    colourCode: getHue(),
-    identifier: 1337
-  })
-}
-
-
 const winnerIdentifier = ref<number | undefined>()
+
 const winner = computed(() => {
   if (winnerIdentifier.value == undefined) return undefined;
   return fingers.value.find(f => f.identifier == winnerIdentifier.value)
@@ -42,6 +31,24 @@ const resetTimer = () => {
     }, 3000)
   }
 }
+
+const TESTING = true
+if (TESTING) {
+  fingers.value.push({
+    x: 120,
+    y: 120,
+    colourCode: getHue(),
+    identifier: 1337
+  })
+  fingers.value.push({
+    x: 220,
+    y: 220,
+    colourCode: getHue(),
+    identifier: 1336
+  })
+  resetTimer()
+}
+
 
 const startTouch = (evt: TouchEvent) => {
   for (const touch of evt.changedTouches) {
