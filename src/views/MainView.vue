@@ -32,7 +32,7 @@ const resetTimer = () => {
   }
 }
 
-const TESTING = true
+const TESTING = false
 if (TESTING) {
   fingers.value.push({
     x: 120,
