@@ -1,20 +1,21 @@
 <script setup lang="ts">
 
-const { x, y, identifier } = defineProps(["x", "y", "identifier"])
-
-console.log({ x, y, identifier })
+const { x, y, colour } = defineProps(["x", "y", "colour"])
 </script>
 
 <template>
-  <div :style="{ left: `${x - 20}px`, top: `${y - 20}px` }" class="circle"></div>
+  <div :style="{ left: `${x}px`, top: `${y}px`, borderColor: colour }" class="circle"></div>
 </template>
 
 <style lang="css" scoped>
 .circle {
   position: absolute;
-  border: 3px solid green;
-  width: 40px;
-  height: 40px;
+  border-width: 8px;
+  border-style: solid;
+  width: 120px;
+  height: 120px;
+  transform: translate(-50%, -50%);
   border-radius: 50%;
+  /* transition: left 10ms linear, top 10ms linear; */
 }
 </style>

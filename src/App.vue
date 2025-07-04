@@ -3,9 +3,9 @@ import { RouterView } from 'vue-router'
 </script>
 
 <template>
-  <header>
+  <!-- <header>
     Kyz
-  </header>
+  </header> -->
 
   <RouterView />
 </template>
