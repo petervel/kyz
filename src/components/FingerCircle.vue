@@ -67,20 +67,22 @@ watch(status, (newStatus) => {
 }
 
 .circle-animation {
-  border-width: 10px;
+  border-width: 5px;
   border-color: black;
   width: 100%;
   height: 100%;
-  opacity: 0;
+  opacity: 1;
+  pointer-events: none;
   color: black;
   position: absolute;
-  transform: scale(1);
+  will-change: transform, opacity;
+  transform: scale(20);
   transition: transform var(--animation-time) ease-out, opacity var(--animation-time) ease;
 }
 
 .circle-animation.animating {
   opacity: 1;
-  transform: scale(5);
+  transform: scale(1);
 }
 
 .won .circle .inner {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import FingerCircle from "../components/FingerCircle.vue"
 import { getHue, releaseHue, type ColourCode } from '../components/hue'
 
@@ -51,6 +51,7 @@ if (TESTING) {
 
 
 const startTouch = (evt: TouchEvent) => {
+  if (winnerIdentifier.value != undefined) return
   for (const touch of evt.changedTouches) {
     const newFinger: Finger = {
       x: touch.clientX,
@@ -83,13 +84,33 @@ const endTouch = (evt: TouchEvent) => {
         return true
       }
     })
+    if (!winnerIdentifier.value || touch.identifier == winnerIdentifier.value) {
+      winnerIdentifier.value = undefined
+      resetTimer()
+    }
   }
-  resetTimer()
 }
 
-window.addEventListener('touchstart', startTouch, { passive: false })
-window.addEventListener('touchmove', trackTouch, { passive: false })
-window.addEventListener('touchend', endTouch, { passive: false })
+onMounted(() => {
+  window.addEventListener('touchstart', startTouch);
+  window.addEventListener('touchmove', trackTouch, { passive: false });
+  window.addEventListener('touchend', endTouch);
+  window.addEventListener('touchcancel', endTouch);
+  window.addEventListener('contextmenu', preventContextMenu);
+
+});
+
+onUnmounted(() => {
+  window.removeEventListener('touchstart', startTouch);
+  window.removeEventListener('touchmove', trackTouch);
+  window.removeEventListener('touchend', endTouch);
+  window.removeEventListener('touchcancel', endTouch);
+  window.removeEventListener('contextmenu', preventContextMenu);
+});
+
+function preventContextMenu(e: Event) {
+  e.preventDefault();
+}
 </script>
 
 <template>
