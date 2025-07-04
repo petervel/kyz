@@ -12,7 +12,7 @@ interface Finger {
 
 const fingers = ref<Finger[]>([])
 
-const TESTING = false
+const TESTING = true
 if (TESTING) {
   fingers.value.push({
     x: 120,
@@ -95,6 +95,6 @@ window.addEventListener('touchend', endTouch, { passive: false })
 <style lang="css" scoped>
 main {
   flex: 1;
-  transition: background-color 300ms ease;
+  transition: background-color 300ms 300ms ease;
 }
 </style>

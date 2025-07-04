@@ -11,9 +11,10 @@ const status = computed(() => {
 </script>
 
 <template>
-  <div class="container" :style="{ left: `${x}px`, top: `${y}px` }">
-    <div :class="status" :style="{ borderColor: colour }" class="circle">
+  <div class="container" :class="status" :style="{ left: `${x}px`, top: `${y}px` }">
+    <div class="circle" :style="{ borderColor: colour }">
       <div class="inner" :style="{ backgroundColor: colour }"></div>
+      <div class="circle-animation"></div>
     </div>
   </div>
 </template>
@@ -25,30 +26,53 @@ const status = computed(() => {
   height: 120px;
   transform: translate(-50%, -50%);
   display: flex;
+  --animation-time: 300ms
 }
 
 .circle {
   flex: 1;
-  border-width: 12px;
-  border-style: solid;
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 300ms ease;
+  transition: opacity var(--animation-time) ease, transform var(--animation-time) ease;
   transform-origin: center center;
+  position: relative;
+  border-width: 10px;
 }
 
-.circle.lost {
+.circle,
+.circle-animation {
+  border-style: solid;
+  border-radius: 50%;
+}
+
+.lost .circle {
   opacity: 0;
   transform: scale(0.5);
 }
 
-.circle.won {
+.won .circle {
   border-color: black !important;
 }
 
-.circle.won .inner {
+.circle-animation {
+  border-width: 10px;
+  border-color: black;
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  color: black;
+  position: absolute;
+  transform: scale(10);
+  transition: transform var(--animation-time) ease-out, opacity var(--animation-time) ease;
+}
+
+.won .circle-animation {
+  opacity: 0;
+  transform: scale(1);
+}
+
+.won .circle .inner {
   background-color: black !important;
 }
 
@@ -56,5 +80,6 @@ const status = computed(() => {
   border-radius: 50%;
   width: 80%;
   height: 80%;
+  position: absolute;
 }
 </style>
