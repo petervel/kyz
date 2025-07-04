@@ -1,0 +1,12 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" rx="40" fill="#111" />
+  
+  <!-- Background circles (fingers) -->
+  <circle cx="60" cy="60" r="20" fill="#e63946" />
+  <circle cx="140" cy="60" r="20" fill="#457b9d" />
+  <circle cx="60" cy="140" r="20" fill="#2a9d8f" />
+  <circle cx="140" cy="140" r="20" fill="#f4a261" />
+  
+  <!-- Highlighted chosen finger -->
+  <circle cx="100" cy="100" r="35" fill="#e9c46a" stroke="#fff" stroke-width="5" />
+</svg>
