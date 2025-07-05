@@ -131,8 +131,8 @@ function preventContextMenu(e: Event) {
       :identifier="finger.identifier" :winner="winnerIdentifier" v-bind:key="finger.identifier" />
     <div v-if="!started" class="start">Touch to start</div>
     <Transition name="fade">
-      <div v-if="started && fingers.length == 0">
-        <div class="hint">Touch the screen</div>
+      <div class="hint" v-if="started && fingers.length == 0">
+        Touch the screen
       </div>
     </Transition>
   </main>
@@ -151,6 +151,10 @@ main {
   font-size: 1.5em;
 }
 
+.hint.hidden {
+  opacity: 0;
+}
+
 .hint {
   font-size: 1.5em;
   opacity: 0.7;
@@ -158,16 +162,24 @@ main {
 }
 
 .fade-enter-active {
-  transition: opacity 10s ease;
+  transition: opacity 3s 3s ease;
 }
 
-.fade-enter-from,
-.fade-leave-to {
+.fade-leave-active {
+  transition: none;
+  /* instant disappear */
+}
+
+.fade-enter-from {
   opacity: 0;
 }
 
-.fade-enter-to,
-.fade-leave-from {
-  opacity: 0.5;
+.fade-enter-to {
+  opacity: 0.7;
+}
+
+.fade-leave-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
