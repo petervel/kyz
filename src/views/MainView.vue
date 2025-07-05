@@ -2,14 +2,9 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import FingerCircle, { type Finger } from "../components/FingerCircle.vue"
 import { createHsl, getHue, releaseHue } from '../components/hue'
+import { playRandomNote, playSound } from '../components/sounds';
 
-import touchSrc from "../../public/sounds/sonar.mp3"
-let touchSound: undefined | HTMLAudioElement = undefined
-
-import chooseSrc from "../../public/sounds/choose.mp3"
-const chooseSound = new Audio(chooseSrc);
-
-const TEST_COUNT = 1
+const TEST_COUNT = 0
 const MIN_COUNT = TEST_COUNT > 0 ? TEST_COUNT + 1 : 2;
 
 const fingers = ref<Finger[]>([])
@@ -27,7 +22,7 @@ const resetTimer = () => {
   if (timeout) {
     clearTimeout(timeout);
     if (soundTimeout) {
-      chooseSound.pause()
+      playSound("choose")
       clearTimeout(soundTimeout)
     }
   }
@@ -35,7 +30,7 @@ const resetTimer = () => {
   if (fingers.value.length >= MIN_COUNT) {
     winnerIdentifier.value = undefined
     soundTimeout = setTimeout(() => {
-      playSound(chooseSound);
+      playSound("choose");
     }, 1500);
     timeout = setTimeout(() => {
       const winnerIndex = Math.floor(Math.random() * fingers.value.length)
@@ -55,11 +50,6 @@ while (fingers.value.length < TEST_COUNT) {
   resetTimer()
 }
 
-const playSound = (sound: HTMLAudioElement) => {
-  sound.currentTime = 0; // rewind to allow rapid retriggers
-  sound.play();
-};
-
 const started = ref(false);
 
 const startTouch = (evt: TouchEvent) => {
@@ -76,12 +66,7 @@ const startTouch = (evt: TouchEvent) => {
       identifier: touch.identifier
     }
     fingers.value.push(newFinger)
-    if (!touchSound) {
-      touchSound = new Audio(touchSrc);
-    }
-    else {
-      playSound(touchSound)
-    }
+    playRandomNote()
   }
   resetTimer()
 }
