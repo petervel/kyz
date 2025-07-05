@@ -4,12 +4,12 @@ import FingerCircle, { type Finger } from "../components/FingerCircle.vue"
 import { createHsl, getHue, releaseHue } from '../components/hue'
 
 import touchSrc from "../../public/sounds/sonar.mp3"
-let touchSound = new Audio(touchSrc);
+let touchSound: undefined | HTMLAudioElement = undefined
 
 import chooseSrc from "../../public/sounds/choose.mp3"
 const chooseSound = new Audio(chooseSrc);
 
-const TEST_COUNT = 0
+const TEST_COUNT = 1
 const MIN_COUNT = TEST_COUNT > 0 ? TEST_COUNT + 1 : 2;
 
 const fingers = ref<Finger[]>([])

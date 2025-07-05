@@ -55,22 +55,46 @@ watch(status, (newStatus) => {
   --animation-time: 300ms;
 }
 
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
 .circle {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: opacity var(--animation-time) ease, transform var(--animation-time) ease;
-  transform-origin: center center;
   position: relative;
   transition: border-color var(--animation-time) var(--animation-time) ease;
   border-width: 10px;
+  animation: pulse 1s infinite, rotate 3s linear infinite;
+  border-style: dashed;
+  border-radius: 50%;
 }
 
-.circle,
-.circle-animation {
-  border-style: solid;
-  border-radius: 50%;
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg)
+  }
+
+  50% {
+    transform: rotate(180deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .lost .circle {
@@ -85,6 +109,9 @@ watch(status, (newStatus) => {
 .circle-animation {
   border-width: 11px;
   border-color: var(--color-background);
+  border-style: solid;
+  border-radius: 50%;
+
   width: 100%;
   height: 100%;
   opacity: 0;
@@ -98,7 +125,7 @@ watch(status, (newStatus) => {
 
 .circle-animation.animating {
   opacity: 1;
-  transform: scale(1.5);
+  transform: scale(1.7);
 }
 
 .won .circle .inner {
