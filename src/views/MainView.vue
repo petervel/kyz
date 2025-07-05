@@ -35,7 +35,6 @@ const resetTimer = () => {
     timeout = setTimeout(() => {
       const winnerIndex = Math.floor(Math.random() * fingers.value.length)
       winnerIdentifier.value = fingers.value[winnerIndex].identifier
-      navigator.vibrate(200);
     }, 3000)
   }
 }
@@ -82,20 +81,24 @@ const trackTouch = (evt: TouchEvent) => {
   }
 }
 
+const removeFinger = (identifier: number) => {
+  fingers.value = fingers.value.filter(finger => {
+    if (finger.identifier == identifier) {
+      releaseHue(finger.hue)
+      return false;
+    } else {
+      return true
+    }
+  })
+  if (!winnerIdentifier.value || identifier == winnerIdentifier.value) {
+    winnerIdentifier.value = undefined
+    resetTimer()
+  }
+}
+
 const endTouch = (evt: TouchEvent) => {
   for (const touch of evt.changedTouches) {
-    fingers.value = fingers.value.filter(finger => {
-      if (finger.identifier == touch.identifier) {
-        releaseHue(finger.hue)
-        return false;
-      } else {
-        return true
-      }
-    })
-    if (!winnerIdentifier.value || touch.identifier == winnerIdentifier.value) {
-      winnerIdentifier.value = undefined
-      resetTimer()
-    }
+    removeFinger(touch.identifier)
   }
 }
 
@@ -128,8 +131,8 @@ function preventContextMenu(e: Event) {
       :identifier="finger.identifier" :winner="winnerIdentifier" v-bind:key="finger.identifier" />
     <div v-if="!started" class="start">Touch to start</div>
     <Transition name="fade">
-      <div class="hint" v-if="started && fingers.length == 0">
-        Touch the screen
+      <div v-if="started && fingers.length == 0">
+        <div class="hint">Touch the screen</div>
       </div>
     </Transition>
   </main>
@@ -149,11 +152,13 @@ main {
 }
 
 .hint {
-  opacity: 0.3;
+  font-size: 1.5em;
+  opacity: 0.7;
+  animation: pulse 3s infinite;
 }
 
 .fade-enter-active {
-  transition: opacity 3s 1s ease;
+  transition: opacity 10s ease;
 }
 
 .fade-enter-from,
@@ -163,6 +168,6 @@ main {
 
 .fade-enter-to,
 .fade-leave-from {
-  opacity: 0.3;
+  opacity: 0.5;
 }
 </style>

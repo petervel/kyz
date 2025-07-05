@@ -1,5 +1,7 @@
 import touch from '../../public/sounds/sonar.mp3';
 import choose from '../../public/sounds/choose.mp3';
+// import movie from '../../public/sounds/climax/movie.mp3';
+import scary from '../../public/sounds/climax/scary.mp3';
 import note1 from '../../public/sounds/notes/do.mp3';
 import note2 from '../../public/sounds/notes/re.mp3';
 import note3 from '../../public/sounds/notes/mi.mp3';
@@ -13,6 +15,7 @@ const NOTES_DICT = { note1, note2, note3, note4, note5, note6, note7 };
 const sources: Record<string, string> = {
 	touch,
 	choose,
+	scary,
 	...NOTES_DICT,
 };
 

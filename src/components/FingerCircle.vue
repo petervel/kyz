@@ -55,19 +55,7 @@ watch(status, (newStatus) => {
   --animation-time: 300ms;
 }
 
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-  }
 
-  50% {
-    transform: scale(1.1);
-  }
-
-  100% {
-    transform: scale(1);
-  }
-}
 
 .circle {
   flex: 1;
