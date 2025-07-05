@@ -1,49 +1,58 @@
-const generatedHues: number[] = []
+const generatedHues: number[] = [];
 
 export type ColourCode = {
-  hue: number
-  colour: string
-}
+  hue: number;
+  colour: string;
+};
+
+type Gap = [number, number];
+
+const findGaps = (): Gap[] => {
+  if (generatedHues.length == 0) {
+    return [[0, 256]];
+  }
+
+  const gaps: Gap[] = [];
+  const sortedHues = [...generatedHues];
+  sortedHues.sort((a, b) => a - b);
+
+  let start = sortedHues.shift()!;
+  const first = start;
+  let next = start;
+  while (sortedHues.length) {
+    next = sortedHues.shift()!;
+    gaps.push([start, next]);
+    start = next;
+  }
+  gaps.push([next, first + 256]);
+  return gaps;
+};
+
+const selectGap = (gaps: Gap[]): Gap => {
+  console.log({ gaps: JSON.stringify(gaps) });
+  const gapIndex = Math.floor(Math.random() ** 3 * gaps.length);
+  console.log({ selected: JSON.stringify(gaps[gapIndex]) });
+  return gaps[gapIndex];
+};
+
+const selectHueInGap = (gap: Gap): number => {
+  return Math.floor(((Math.random() + Math.random()) / 2) * (gap[1] - gap[0]) + gap[0]) % 256;
+};
+
+export const getHue = () => {
+  // generatedHues.push(Math.floor(Math.random() * 256));
+  const gaps = findGaps();
+  const sortedGaps = gaps.sort((a, b) => b[1] - b[0] - (a[1] - a[0]));
+  console.log({ gaps, sortedGaps });
+  const gap = selectGap(sortedGaps);
+  const hue = selectHueInGap(gap);
+  generatedHues.push(hue);
+  return hue;
+};
+
+export const createHsl = (hue: number) => `hsl(${hue % 256}, 80%, 60%)`;
 
 export function releaseHue(hue: number) {
-  const hueIndex = generatedHues.indexOf(hue)
-  if (hueIndex != -1) generatedHues.splice(hueIndex, 1)
-}
-
-export function getHue(
-  minDistance: number = 30,
-  maxTries: number = 20,
-): { hue: number; colour: string } {
-  const saturation = 80
-  const lightness = 60
-
-  function isFarEnough(hue: number): boolean {
-    return generatedHues.every(
-      (h) => Math.min(Math.abs(hue - h), 360 - Math.abs(hue - h)) >= minDistance,
-    )
-  }
-
-  function makeObject(hue: number) {
-    generatedHues.push(hue)
-
-    return {
-      hue,
-      colour: `hsl(${hue}, ${saturation}%, ${lightness}%)`,
-    }
-  }
-
-  for (let i = 0; i < maxTries; i++) {
-    const hue = Math.floor(Math.random() * 360)
-    if (isFarEnough(hue)) {
-      return makeObject(hue)
-    }
-  }
-
-  // fallback to a random hue if no sufficiently distant hue found
-  let fallbackHue = Math.floor(Math.random() * 360)
-  let triedCounter = 0
-  while (generatedHues.includes(fallbackHue)) {
-    if (triedCounter++ == 255) fallbackHue = (fallbackHue + 1) % 255
-  }
-  return makeObject(fallbackHue)
+  const hueIndex = generatedHues.indexOf(hue);
+  if (hueIndex != -1) generatedHues.splice(hueIndex, 1);
 }

@@ -1,14 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import FingerCircle from "../components/FingerCircle.vue"
-import { getHue, releaseHue, type ColourCode } from '../components/hue'
+import FingerCircle, { type Finger } from "../components/FingerCircle.vue"
+import { createHsl, getHue, releaseHue } from '../components/hue'
 
-interface Finger {
-  x: number,
-  y: number,
-  colourCode: ColourCode,
-  identifier: number
-}
+const TESTING = true
 
 const fingers = ref<Finger[]>([])
 const winnerIdentifier = ref<number | undefined>()
@@ -28,22 +23,21 @@ const resetTimer = () => {
     timeout = setTimeout(() => {
       const winnerIndex = Math.floor(Math.random() * fingers.value.length)
       winnerIdentifier.value = fingers.value[winnerIndex].identifier
-    }, 3000)
+    }, 30000)
   }
 }
 
-const TESTING = false
 if (TESTING) {
   fingers.value.push({
     x: 120,
     y: 120,
-    colourCode: getHue(),
+    hue: getHue(),
     identifier: 1337
   })
   fingers.value.push({
     x: 220,
     y: 220,
-    colourCode: getHue(),
+    hue: getHue(),
     identifier: 1336
   })
   resetTimer()
@@ -56,7 +50,7 @@ const startTouch = (evt: TouchEvent) => {
     const newFinger: Finger = {
       x: touch.clientX,
       y: touch.clientY,
-      colourCode: getHue(),
+      hue: getHue(),
       identifier: touch.identifier
     }
     fingers.value.push(newFinger)
@@ -78,7 +72,7 @@ const endTouch = (evt: TouchEvent) => {
   for (const touch of evt.changedTouches) {
     fingers.value = fingers.value.filter(finger => {
       if (finger.identifier == touch.identifier) {
-        releaseHue(finger.colourCode.hue)
+        releaseHue(finger.hue)
         return false;
       } else {
         return true
@@ -114,8 +108,8 @@ function preventContextMenu(e: Event) {
 </script>
 
 <template>
-  <main :style="{ backgroundColor: winner ? winner.colourCode.colour : 'unset' }">
-    <FingerCircle v-for="finger in fingers" :x="finger.x" :y="finger.y" :colour="finger.colourCode.colour"
+  <main :style="{ backgroundColor: winner ? createHsl(winner.hue) : 'unset' }">
+    <FingerCircle v-for="finger in fingers" :x="finger.x" :y="finger.y" :hue="finger.hue"
       :identifier="finger.identifier" :winner="winnerIdentifier" v-bind:key="finger.identifier" />
   </main>
 </template>
