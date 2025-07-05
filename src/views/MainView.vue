@@ -3,7 +3,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import FingerCircle, { type Finger } from "../components/FingerCircle.vue"
 import { createHsl, getHue, releaseHue } from '../components/hue'
 
-const TESTING = true
+const TESTING = false
 
 const fingers = ref<Finger[]>([])
 const winnerIdentifier = ref<number | undefined>()
@@ -23,7 +23,7 @@ const resetTimer = () => {
     timeout = setTimeout(() => {
       const winnerIndex = Math.floor(Math.random() * fingers.value.length)
       winnerIdentifier.value = fingers.value[winnerIndex].identifier
-    }, 30000)
+    }, 3000)
   }
 }
 
