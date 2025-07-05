@@ -2,7 +2,7 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import FingerCircle, { type Finger } from "../components/FingerCircle.vue"
 import { createHsl, getHue, releaseHue } from '../components/hue'
-import { playRandomNote, playSound } from '../components/sounds';
+import { playRandomNote, playSound, stopSound } from '../components/sounds';
 
 const TEST_COUNT = 0
 const MIN_COUNT = TEST_COUNT > 0 ? TEST_COUNT + 1 : 2;
@@ -22,7 +22,7 @@ const resetTimer = () => {
   if (timeout) {
     clearTimeout(timeout);
     if (soundTimeout) {
-      playSound("choose")
+      stopSound("choose")
       clearTimeout(soundTimeout)
     }
   }
@@ -35,6 +35,7 @@ const resetTimer = () => {
     timeout = setTimeout(() => {
       const winnerIndex = Math.floor(Math.random() * fingers.value.length)
       winnerIdentifier.value = fingers.value[winnerIndex].identifier
+      navigator.vibrate(200);
     }, 3000)
   }
 }
