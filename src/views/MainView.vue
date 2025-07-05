@@ -3,6 +3,12 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import FingerCircle, { type Finger } from "../components/FingerCircle.vue"
 import { createHsl, getHue, releaseHue } from '../components/hue'
 
+import touchSrc from "../../public/sounds/sonar.mp3"
+let touchSound = new Audio(touchSrc);
+
+import chooseSrc from "../../public/sounds/choose.mp3"
+const chooseSound = new Audio(chooseSrc);
+
 const TESTING = false
 
 const fingers = ref<Finger[]>([])
@@ -14,12 +20,22 @@ const winner = computed(() => {
 })
 
 let timeout: ReturnType<typeof setTimeout> | null = null
+let soundTimeout: ReturnType<typeof setTimeout> | null = null
 
 const resetTimer = () => {
-  if (timeout) clearTimeout(timeout)
+  if (timeout) {
+    clearTimeout(timeout);
+    if (soundTimeout) {
+      chooseSound.pause()
+      clearTimeout(soundTimeout)
+    }
+  }
 
   if (fingers.value.length >= 1) {
     winnerIdentifier.value = undefined
+    soundTimeout = setTimeout(() => {
+      playSound(chooseSound);
+    }, 1500);
     timeout = setTimeout(() => {
       const winnerIndex = Math.floor(Math.random() * fingers.value.length)
       winnerIdentifier.value = fingers.value[winnerIndex].identifier
@@ -43,8 +59,20 @@ if (TESTING) {
   resetTimer()
 }
 
+const playSound = (sound: HTMLAudioElement) => {
+  sound.currentTime = 0; // rewind to allow rapid retriggers
+  sound.play();
+};
+
+const started = ref(false);
 
 const startTouch = (evt: TouchEvent) => {
+  if (!started.value) {
+    started.value = true;
+    evt.preventDefault()
+    return
+  }
+
   if (winnerIdentifier.value != undefined) return
   for (const touch of evt.changedTouches) {
     const newFinger: Finger = {
@@ -54,6 +82,10 @@ const startTouch = (evt: TouchEvent) => {
       identifier: touch.identifier
     }
     fingers.value.push(newFinger)
+    if (!touchSound) {
+      touchSound = new Audio(touchSrc);
+    }
+    playSound(touchSound)
   }
   resetTimer()
 }
@@ -85,8 +117,9 @@ const endTouch = (evt: TouchEvent) => {
   }
 }
 
+
 onMounted(() => {
-  window.addEventListener('touchstart', startTouch);
+  window.addEventListener('touchstart', startTouch, { passive: false });
   window.addEventListener('touchmove', trackTouch, { passive: false });
   window.addEventListener('touchend', endTouch);
   window.addEventListener('touchcancel', endTouch);
@@ -111,7 +144,12 @@ function preventContextMenu(e: Event) {
   <main :style="{ backgroundColor: winner ? createHsl(winner.hue) : 'unset' }">
     <FingerCircle v-for="finger in fingers" :x="finger.x" :y="finger.y" :hue="finger.hue"
       :identifier="finger.identifier" :winner="winnerIdentifier" v-bind:key="finger.identifier" />
-    <div class="hint" v-if="fingers.length == 0">Touch the screen</div>
+    <div v-if="!started" class="start">Touch to start</div>
+    <Transition name="fade">
+      <div class="hint" v-if="started && fingers.length == 0">
+        Touch the screen
+      </div>
+    </Transition>
   </main>
 </template>
 
@@ -124,7 +162,25 @@ main {
   align-items: center;
 }
 
+.start {
+  font-size: 1.5em;
+}
+
 .hint {
+  opacity: 0.3;
+}
+
+.fade-enter-active {
+  transition: opacity 3s 1s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.fade-enter-to,
+.fade-leave-from {
   opacity: 0.3;
 }
 </style>
