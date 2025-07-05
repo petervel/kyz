@@ -111,6 +111,7 @@ function preventContextMenu(e: Event) {
   <main :style="{ backgroundColor: winner ? createHsl(winner.hue) : 'unset' }">
     <FingerCircle v-for="finger in fingers" :x="finger.x" :y="finger.y" :hue="finger.hue"
       :identifier="finger.identifier" :winner="winnerIdentifier" v-bind:key="finger.identifier" />
+    <div class="hint" v-if="fingers.length == 0">Touch the screen</div>
   </main>
 </template>
 
@@ -118,5 +119,12 @@ function preventContextMenu(e: Event) {
 main {
   flex: 1;
   transition: background-color 300ms 300ms ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hint {
+  opacity: 0.3;
 }
 </style>
