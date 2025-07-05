@@ -18,7 +18,7 @@ let timeout: ReturnType<typeof setTimeout> | null = null
 const resetTimer = () => {
   if (timeout) clearTimeout(timeout)
 
-  if (fingers.value.length >= 2) {
+  if (fingers.value.length >= 1) {
     winnerIdentifier.value = undefined
     timeout = setTimeout(() => {
       const winnerIndex = Math.floor(Math.random() * fingers.value.length)

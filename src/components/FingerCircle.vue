@@ -28,10 +28,10 @@ const animating = ref(false);
 
 watch(status, (newStatus) => {
   if (newStatus === "won") {
-    animating.value = true;
+    animating.value = false;
     setTimeout(() => {
-      animating.value = false;
-    }, 300); // match --animation-time
+      animating.value = true;
+    }, 300); // --animation-time
   }
 });
 </script>
@@ -52,7 +52,8 @@ watch(status, (newStatus) => {
   height: 120px;
   transform: translate(-50%, -50%);
   display: flex;
-  --animation-time: 300ms
+  --animation-time: 300ms;
+  --border-width: 5px;
 }
 
 .circle {
@@ -63,6 +64,7 @@ watch(status, (newStatus) => {
   transition: opacity var(--animation-time) ease, transform var(--animation-time) ease;
   transform-origin: center center;
   position: relative;
+  transition: border-color var(--animation-time) var(--animation-time) ease;
   border-width: 10px;
 }
 
@@ -78,33 +80,34 @@ watch(status, (newStatus) => {
 }
 
 .won .circle {
-  border-color: black !important;
+  border-color: var(--color-background) !important;
 }
 
 .circle-animation {
-  border-width: 5px;
-  border-color: black;
+  border-width: var(--border-width);
+  border-color: var(--color-background);
   width: 100%;
   height: 100%;
   opacity: 1;
   pointer-events: none;
-  color: black;
+  color: var(--color-background);
   position: absolute;
   will-change: transform, opacity;
-  transform: scale(20);
+  transform: scale(10);
   transition: transform var(--animation-time) ease-out, opacity var(--animation-time) ease;
 }
 
 .circle-animation.animating {
   opacity: 1;
-  transform: scale(1);
+  transform: scale(0);
 }
 
 .won .circle .inner {
-  background-color: black !important;
+  background-color: var(--color-background) !important;
 }
 
-.inner {
+.circle .inner {
+  transition: background-color var(--animation-time) var(--animation-time) ease;
   border-radius: 50%;
   width: 80%;
   height: 80%;
