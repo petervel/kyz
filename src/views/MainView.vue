@@ -9,7 +9,8 @@ let touchSound = new Audio(touchSrc);
 import chooseSrc from "../../public/sounds/choose.mp3"
 const chooseSound = new Audio(chooseSrc);
 
-const TESTING = false
+const TEST_COUNT = 0
+const MIN_COUNT = TEST_COUNT > 0 ? TEST_COUNT + 1 : 2;
 
 const fingers = ref<Finger[]>([])
 const winnerIdentifier = ref<number | undefined>()
@@ -31,7 +32,7 @@ const resetTimer = () => {
     }
   }
 
-  if (fingers.value.length >= 1) {
+  if (fingers.value.length >= MIN_COUNT) {
     winnerIdentifier.value = undefined
     soundTimeout = setTimeout(() => {
       playSound(chooseSound);
@@ -43,18 +44,13 @@ const resetTimer = () => {
   }
 }
 
-if (TESTING) {
+while (fingers.value.length < TEST_COUNT) {
+  const len = fingers.value.length
   fingers.value.push({
-    x: 120,
-    y: 120,
+    x: (len + 1) * 100,
+    y: (len + 1) * 100,
     hue: getHue(),
-    identifier: 1337
-  })
-  fingers.value.push({
-    x: 220,
-    y: 220,
-    hue: getHue(),
-    identifier: 1336
+    identifier: 1337 + len
   })
   resetTimer()
 }
@@ -69,8 +65,6 @@ const started = ref(false);
 const startTouch = (evt: TouchEvent) => {
   if (!started.value) {
     started.value = true;
-    evt.preventDefault()
-    return
   }
 
   if (winnerIdentifier.value != undefined) return
@@ -85,7 +79,9 @@ const startTouch = (evt: TouchEvent) => {
     if (!touchSound) {
       touchSound = new Audio(touchSrc);
     }
-    playSound(touchSound)
+    else {
+      playSound(touchSound)
+    }
   }
   resetTimer()
 }
