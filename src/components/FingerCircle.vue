@@ -53,7 +53,6 @@ watch(status, (newStatus) => {
   transform: translate(-50%, -50%);
   display: flex;
   --animation-time: 300ms;
-  --border-width: 5px;
 }
 
 .circle {
@@ -84,7 +83,7 @@ watch(status, (newStatus) => {
 }
 
 .circle-animation {
-  border-width: var(--border-width);
+  border-width: 5px;
   border-color: var(--color-background);
   width: 100%;
   height: 100%;

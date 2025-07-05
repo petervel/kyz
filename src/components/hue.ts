@@ -29,9 +29,7 @@ const findGaps = (): Gap[] => {
 };
 
 const selectGap = (gaps: Gap[]): Gap => {
-  console.log({ gaps: JSON.stringify(gaps) });
   const gapIndex = Math.floor(Math.random() ** 3 * gaps.length);
-  console.log({ selected: JSON.stringify(gaps[gapIndex]) });
   return gaps[gapIndex];
 };
 
@@ -43,7 +41,6 @@ export const getHue = () => {
   // generatedHues.push(Math.floor(Math.random() * 256));
   const gaps = findGaps();
   const sortedGaps = gaps.sort((a, b) => b[1] - b[0] - (a[1] - a[0]));
-  console.log({ gaps, sortedGaps });
   const gap = selectGap(sortedGaps);
   const hue = selectHueInGap(gap);
   generatedHues.push(hue);
