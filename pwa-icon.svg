@@ -1,12 +1,23 @@
-<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-  <rect width="200" height="200" rx="40" fill="#111" />
-  
-  <!-- Background circles (fingers) -->
-  <circle cx="60" cy="60" r="20" fill="#e63946" />
-  <circle cx="140" cy="60" r="20" fill="#457b9d" />
-  <circle cx="60" cy="140" r="20" fill="#2a9d8f" />
-  <circle cx="140" cy="140" r="20" fill="#f4a261" />
-  
-  <!-- Highlighted chosen finger (purple) -->
-  <circle cx="100" cy="100" r="35" fill="#e9c46a" stroke="#fff" stroke-width="5" />
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 200 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;">
+    <path d="M200,40L200,160C200,182.077 182.077,200 160,200L40,200C17.923,200 0,182.077 0,160L0,40C0,17.923 17.923,0 40,0L160,0C182.077,0 200,17.923 200,40Z" style="fill:rgb(17,17,17);"/>
+    <g transform="matrix(1,0,0,1,-10,-10)">
+        <circle cx="60" cy="60" r="20" style="fill:rgb(230,57,70);"/>
+    </g>
+    <g transform="matrix(1,0,0,1,10,-10)">
+        <circle cx="140" cy="60" r="20" style="fill:rgb(69,123,157);"/>
+    </g>
+    <g transform="matrix(1,0,0,1,-10,10)">
+        <circle cx="60" cy="140" r="20" style="fill:rgb(42,157,143);"/>
+    </g>
+    <g transform="matrix(1,0,0,1,10,10)">
+        <circle cx="140" cy="140" r="20" style="fill:rgb(244,162,97);"/>
+    </g>
+    <g transform="matrix(1.44202,0,0,1.42965,-44.2023,-42.9651)">
+        <circle cx="100" cy="100" r="35" style="stroke:rgb(233,196,106);stroke-width:5px;"/>
+    </g>
+    <g transform="matrix(1.14762,0,0,1.13777,-14.7616,-13.7769)">
+        <circle cx="100" cy="100" r="35" style="fill:rgb(233,196,106);"/>
+    </g>
 </svg>
