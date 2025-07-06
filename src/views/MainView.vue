@@ -1,138 +1,127 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
-import FingerCircle, { type Finger } from "../components/FingerCircle.vue"
+import { computed, ref, watch } from 'vue'
+import FingerCircle from "../components/FingerCircle.vue"
 import { createHsl, getHue, releaseHue } from '../components/hue'
-import { playRandomNote, playSound, stopSound } from '../components/sounds';
+import { playSound, stopSound } from '../components/sounds';
 
-const TEST_COUNT = 0
-const MIN_COUNT = TEST_COUNT > 0 ? TEST_COUNT + 1 : 2;
+import { useMultitouch, type Touch } from '../components/multitouch';
 
-const fingers = ref<Finger[]>([])
-const winnerIdentifier = ref<number | undefined>()
+const DEV_MODE = true
 
-const winner = computed(() => {
-  if (winnerIdentifier.value == undefined) return undefined;
-  return fingers.value.find(f => f.identifier == winnerIdentifier.value)
-})
+const { touches, clearTouches } = useMultitouch();
 
-let timeout: ReturnType<typeof setTimeout> | null = null
-let soundTimeout: ReturnType<typeof setTimeout> | null = null
+const hues = new Map<string, number>();
+// colours
+watch(touches, () => {
+  for (const [id, hue] of hues.entries()) {
+    const touch = Object.values(touches.value).find(f => f.id == id)
+    if (!touch) {
+      // touch no longer exists
+      releaseHue(hue);
+      hues.delete(id)
+    }
+  }
+  console.log(hues)
 
-const resetTimer = () => {
-  if (timeout) {
-    clearTimeout(timeout);
-    if (soundTimeout) {
+}, { deep: true })
+
+const getHueForId = (id: string | undefined) => {
+  if (id == undefined) return 0;
+
+  if (!hues.has(id)) {
+    hues.set(id, getHue());
+  }
+  return hues.get(id)!;
+}
+
+const getColourForId = (id: string | null) => {
+  if (!id) {
+    return 'unset'
+  }
+  const hue = getHueForId(id);
+  console.log("getting bg for ", JSON.stringify(id), "got", hue)
+  return createHsl(hue);
+}
+
+const touchCount = computed(() => Object.keys(touches.value).length);
+
+const choice = <T>(list: T[]): T | null => {
+  if (list.length > 0) {
+    return list[Math.floor(Math.random() * list.length)]
+  }
+  return null
+}
+
+type WinnerState = {
+  prevCount: number;
+  timeout: ReturnType<typeof setTimeout> | null;
+  soundTimeout: ReturnType<typeof setTimeout> | null;
+  resetTimeout: ReturnType<typeof setTimeout> | null;
+  winnerId: string | null
+}
+
+const BLANK_STATE = {
+  prevCount: 0,
+  timeout: null,
+  soundTimeout: null,
+  resetTimeout: null,
+  winnerId: null
+}
+const winnerState = ref<WinnerState>(BLANK_STATE);
+
+const reset = () => {
+  clearTouches()
+  winnerState.value.prevCount = 0;
+  winnerState.value.timeout = null;
+  winnerState.value.soundTimeout = null;
+  winnerState.value.resetTimeout = null;
+  winnerState.value.winnerId = null;
+}
+
+const MIN_COUNT = DEV_MODE ? 1 : 2
+// winner checking
+watch(touches, () => {
+  const counter = Object.keys(touches.value).length
+  if (counter == winnerState.value.prevCount) return;
+  winnerState.value.prevCount = counter;
+
+  if (winnerState.value.timeout) {
+    clearTimeout(winnerState.value.timeout);
+    winnerState.value.timeout = null;
+
+    if (winnerState.value.soundTimeout) {
+      clearTimeout(winnerState.value.soundTimeout);
+      winnerState.value.soundTimeout = null;
+    }
+    else {
       stopSound("choose")
-      clearTimeout(soundTimeout)
     }
   }
-
-  if (fingers.value.length >= MIN_COUNT) {
-    winnerIdentifier.value = undefined
-    soundTimeout = setTimeout(() => {
+  if (counter >= MIN_COUNT) {
+    console.log("cue sound")
+    winnerState.value.soundTimeout = setTimeout(() => {
+      console.log("play sound")
       playSound("choose");
+      winnerState.value.soundTimeout = null;
     }, 1500);
-    timeout = setTimeout(() => {
-      const winnerIndex = Math.floor(Math.random() * fingers.value.length)
-      winnerIdentifier.value = fingers.value[winnerIndex].identifier
-    }, 3000)
+
+    winnerState.value.timeout = setTimeout(() => {
+      const winner = choice<Touch>(Object.values(touches.value))
+      winnerState.value.winnerId = winner!.id
+      winnerState.value.timeout = null;
+      winnerState.value.resetTimeout = setTimeout(reset, 1500)
+    }, 3000);
   }
-}
-
-while (fingers.value.length < TEST_COUNT) {
-  const len = fingers.value.length
-  fingers.value.push({
-    x: (len + 1) * 100,
-    y: (len + 1) * 100,
-    hue: getHue(),
-    identifier: 1337 + len
-  })
-  resetTimer()
-}
-
-const started = ref(false);
-
-const startTouch = (evt: TouchEvent) => {
-  if (!started.value) {
-    started.value = true;
-  }
-
-  if (winnerIdentifier.value != undefined) return
-  for (const touch of evt.changedTouches) {
-    const newFinger: Finger = {
-      x: touch.clientX,
-      y: touch.clientY,
-      hue: getHue(),
-      identifier: touch.identifier
-    }
-    fingers.value.push(newFinger)
-    playRandomNote()
-  }
-  resetTimer()
-}
-
-const trackTouch = (evt: TouchEvent) => {
-  evt.preventDefault();
-  for (const touch of evt.changedTouches) {
-    const finger = fingers.value.find(f => f.identifier == touch.identifier);
-    if (finger) {
-      finger.x = touch.pageX;
-      finger.y = touch.pageY
-    }
-  }
-}
-
-const removeFinger = (identifier: number) => {
-  fingers.value = fingers.value.filter(finger => {
-    if (finger.identifier == identifier) {
-      releaseHue(finger.hue)
-      return false;
-    } else {
-      return true
-    }
-  })
-  if (!winnerIdentifier.value || identifier == winnerIdentifier.value) {
-    winnerIdentifier.value = undefined
-    resetTimer()
-  }
-}
-
-const endTouch = (evt: TouchEvent) => {
-  for (const touch of evt.changedTouches) {
-    removeFinger(touch.identifier)
-  }
-}
-
-
-onMounted(() => {
-  window.addEventListener('touchstart', startTouch, { passive: false });
-  window.addEventListener('touchmove', trackTouch, { passive: false });
-  window.addEventListener('touchend', endTouch);
-  window.addEventListener('touchcancel', endTouch);
-  window.addEventListener('contextmenu', preventContextMenu);
-
-});
-
-onUnmounted(() => {
-  window.removeEventListener('touchstart', startTouch);
-  window.removeEventListener('touchmove', trackTouch);
-  window.removeEventListener('touchend', endTouch);
-  window.removeEventListener('touchcancel', endTouch);
-  window.removeEventListener('contextmenu', preventContextMenu);
-});
-
-function preventContextMenu(e: Event) {
-  e.preventDefault();
-}
+}, { deep: true });
 </script>
 
 <template>
-  <main :style="{ backgroundColor: winner ? createHsl(winner.hue) : 'unset' }">
-    <FingerCircle v-for="finger in fingers" :finger="finger" :winner="winnerIdentifier"
-      v-bind:key="finger.identifier" />
-    <div v-if="!started" class="start">Touch to start</div>
+  <main :style="{ backgroundColor: getColourForId(winnerState.winnerId) }">
+    <FingerCircle v-for="touch in touches" :touch="touch" :colour="getColourForId(touch.id)" :key="touch.id"
+      :winner="winnerState.winnerId" />
+
     <Transition name="fade">
-      <div class="hint" v-if="started && fingers.length == 0">
+      <div class="hint" v-if="touchCount == 0">
         Touch the screen
       </div>
     </Transition>
@@ -142,26 +131,19 @@ function preventContextMenu(e: Event) {
 <style lang="css" scoped>
 main {
   flex: 1;
-  transition: background-color 300ms 300ms ease;
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.start {
-  font-size: 1.5em;
-}
-
-.hint.hidden {
-  opacity: 0;
+  transition: background-color 300ms 300ms ease;
 }
 
 .hint {
-  font-size: 1.5em;
-  opacity: 0.7;
+  font-size: 2em;
+  opacity: 0.8;
   animation: pulse 3s infinite;
 }
 
+/*  ===== FADE ANIMATION ===== */
 .fade-enter-active {
   transition: opacity 3s 3s ease;
 }

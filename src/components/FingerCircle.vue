@@ -1,24 +1,19 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { createHsl } from './hue';
-
-export interface Finger {
-  x: number,
-  y: number,
-  hue: number,
-  identifier: number
-}
+import type { Touch } from './multitouch';
+import { playRandomNote } from './sounds';
 
 type FingerProps = {
-  finger: Finger,
-  winner?: number
+  touch: Touch,
+  colour: string,
+  winner?: string | null
 }
 
-const { finger, winner } = defineProps<FingerProps>()
+const { touch, colour, winner } = defineProps<FingerProps>()
 
 const status = computed(() => {
   if (winner == undefined) return "playing";
-  return (winner == finger.identifier) ? "won" : "lost";
+  return (winner == touch.id) ? "won" : "lost";
 })
 
 const animating = ref(false);
@@ -31,12 +26,15 @@ watch(status, (newStatus) => {
     }, 300); // --animation-time
   }
 });
+
+playRandomNote();
+
 </script>
 
 <template>
-  <div class="container" :class="status" :style="{ left: `${finger.x}px`, top: `${finger.y}px` }">
-    <div class="circle" :style="{ borderColor: createHsl(finger.hue) }">
-      <div class="inner" :style="{ backgroundColor: createHsl(finger.hue) }"></div>
+  <div class="container" :class="status" :style="{ left: `${touch.x}px`, top: `${touch.y}px` }">
+    <div class="circle" :style="{ borderColor: colour }">
+      <div class="inner" :style="{ backgroundColor: colour }"></div>
       <div class="circle-animation" :class="{ animating }"></div>
     </div>
   </div>
@@ -51,8 +49,6 @@ watch(status, (newStatus) => {
   display: flex;
   --animation-time: 300ms;
 }
-
-
 
 .circle {
   flex: 1;
