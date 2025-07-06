@@ -74,10 +74,11 @@ const startTouch = (evt: TouchEvent) => {
 const trackTouch = (evt: TouchEvent) => {
   evt.preventDefault();
   for (const touch of evt.changedTouches) {
-    fingers.value = fingers.value.map(finger => {
-      if (finger.identifier != touch.identifier) return finger;
-      return { ...finger, x: touch.pageX, y: touch.pageY }
-    })
+    const finger = fingers.value.find(f => f.identifier == touch.identifier);
+    if (finger) {
+      finger.x = touch.pageX;
+      finger.y = touch.pageY
+    }
   }
 }
 
@@ -127,8 +128,8 @@ function preventContextMenu(e: Event) {
 
 <template>
   <main :style="{ backgroundColor: winner ? createHsl(winner.hue) : 'unset' }">
-    <FingerCircle v-for="finger in fingers" :x="finger.x" :y="finger.y" :hue="finger.hue"
-      :identifier="finger.identifier" :winner="winnerIdentifier" v-bind:key="finger.identifier" />
+    <FingerCircle v-for="finger in fingers" :finger="finger" :winner="winnerIdentifier"
+      v-bind:key="finger.identifier" />
     <div v-if="!started" class="start">Touch to start</div>
     <Transition name="fade">
       <div class="hint" v-if="started && fingers.length == 0">

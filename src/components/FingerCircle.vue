@@ -10,18 +10,15 @@ export interface Finger {
 }
 
 type FingerProps = {
-  x: number,
-  y: number,
-  hue: number,
-  identifier: number,
+  finger: Finger,
   winner?: number
 }
 
-const { x, y, hue, identifier, winner } = defineProps<FingerProps>()
+const { finger, winner } = defineProps<FingerProps>()
 
 const status = computed(() => {
   if (winner == undefined) return "playing";
-  return (winner == identifier) ? "won" : "lost";
+  return (winner == finger.identifier) ? "won" : "lost";
 })
 
 const animating = ref(false);
@@ -37,9 +34,9 @@ watch(status, (newStatus) => {
 </script>
 
 <template>
-  <div class="container" :class="status" :style="{ left: `${x}px`, top: `${y}px` }">
-    <div class="circle" :style="{ borderColor: createHsl(hue) }">
-      <div class="inner" :style="{ backgroundColor: createHsl(hue) }"></div>
+  <div class="container" :class="status" :style="{ left: `${finger.x}px`, top: `${finger.y}px` }">
+    <div class="circle" :style="{ borderColor: createHsl(finger.hue) }">
+      <div class="inner" :style="{ backgroundColor: createHsl(finger.hue) }"></div>
       <div class="circle-animation" :class="{ animating }"></div>
     </div>
   </div>
