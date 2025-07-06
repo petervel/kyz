@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onUnmounted, ref, watch } from 'vue'
 import FingerCircle from "../components/FingerCircle.vue"
 import { createHsl, getHue, releaseHue } from '../components/hue'
 import { playSound, stopSound } from '../components/sounds';
 
 import { useMultitouch, type Touch } from '../components/multitouch';
+import { choice } from '../components/util';
 
-const DEV_MODE = true
+const DEV_MODE = false
 
-const { touches, clearTouches } = useMultitouch();
+const { touches, startListening, stopListening, clearTouches } = useMultitouch();
 
 const hues = new Map<string, number>();
 // colours
@@ -21,8 +22,6 @@ watch(touches, () => {
       hues.delete(id)
     }
   }
-  console.log(hues)
-
 }, { deep: true })
 
 const getHueForId = (id: string | undefined) => {
@@ -39,18 +38,10 @@ const getColourForId = (id: string | null) => {
     return 'unset'
   }
   const hue = getHueForId(id);
-  console.log("getting bg for ", JSON.stringify(id), "got", hue)
   return createHsl(hue);
 }
 
 const touchCount = computed(() => Object.keys(touches.value).length);
-
-const choice = <T>(list: T[]): T | null => {
-  if (list.length > 0) {
-    return list[Math.floor(Math.random() * list.length)]
-  }
-  return null
-}
 
 type WinnerState = {
   prevCount: number;
@@ -60,14 +51,13 @@ type WinnerState = {
   winnerId: string | null
 }
 
-const BLANK_STATE = {
+const winnerState = ref<WinnerState>({
   prevCount: 0,
   timeout: null,
   soundTimeout: null,
   resetTimeout: null,
   winnerId: null
-}
-const winnerState = ref<WinnerState>(BLANK_STATE);
+});
 
 const reset = () => {
   clearTouches()
@@ -98,9 +88,7 @@ watch(touches, () => {
     }
   }
   if (counter >= MIN_COUNT) {
-    console.log("cue sound")
     winnerState.value.soundTimeout = setTimeout(() => {
-      console.log("play sound")
       playSound("choose");
       winnerState.value.soundTimeout = null;
     }, 1500);
@@ -113,15 +101,26 @@ watch(touches, () => {
     }, 3000);
   }
 }, { deep: true });
+
+const started = ref(false);
+function startGame() {
+  started.value = true;
+  playSound('touch', 0); // will now work since this is inside a user-initiated click/tap
+  startListening();
+}
+onUnmounted(stopListening);
 </script>
 
 <template>
   <main :style="{ backgroundColor: getColourForId(winnerState.winnerId) }">
+    <div v-if="!started" class="start-overlay" @click="startGame">
+      Tap to start
+    </div>
     <FingerCircle v-for="touch in touches" :touch="touch" :colour="getColourForId(touch.id)" :key="touch.id"
       :winner="winnerState.winnerId" />
 
     <Transition name="fade">
-      <div class="hint" v-if="touchCount == 0">
+      <div class="hint" v-if="started && touchCount == 0">
         Touch the screen
       </div>
     </Transition>
@@ -129,6 +128,15 @@ watch(touches, () => {
 </template>
 
 <style lang="css" scoped>
+.start-overlay {
+  z-index: 10;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  line-height: 100vh;
+  text-align: center;
+}
+
 main {
   flex: 1;
   display: flex;

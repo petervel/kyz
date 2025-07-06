@@ -1,4 +1,4 @@
-import { onMounted, onUnmounted, readonly, ref } from 'vue';
+import { readonly, ref } from 'vue';
 
 let idCounter = 1;
 export type Touch = {
@@ -48,22 +48,28 @@ const preventContextMenu = (e: Event) => {
 	e.preventDefault();
 };
 
+let listening = false;
+const startListening = () => {
+	if (listening) return;
+
+	window.addEventListener('touchstart', startTouch);
+	window.addEventListener('touchmove', trackTouch, { passive: false });
+	window.addEventListener('touchend', endTouch);
+	window.addEventListener('touchcancel', endTouch);
+	window.addEventListener('contextmenu', preventContextMenu);
+	listening = true;
+};
+
+const stopListening = () => {
+	if (!listening) return;
+	window.removeEventListener('touchstart', startTouch);
+	window.removeEventListener('touchmove', trackTouch);
+	window.removeEventListener('touchend', endTouch);
+	window.removeEventListener('touchcancel', endTouch);
+	window.removeEventListener('contextmenu', preventContextMenu);
+	listening = false;
+};
+
 export const useMultitouch = () => {
-	onMounted(() => {
-		window.addEventListener('touchstart', startTouch);
-		window.addEventListener('touchmove', trackTouch, { passive: false });
-		window.addEventListener('touchend', endTouch);
-		window.addEventListener('touchcancel', endTouch);
-		window.addEventListener('contextmenu', preventContextMenu);
-	});
-
-	onUnmounted(() => {
-		window.removeEventListener('touchstart', startTouch);
-		window.removeEventListener('touchmove', trackTouch);
-		window.removeEventListener('touchend', endTouch);
-		window.removeEventListener('touchcancel', endTouch);
-		window.removeEventListener('contextmenu', preventContextMenu);
-	});
-
-	return { touches: readonly(touches), clearTouches };
+	return { touches: readonly(touches), startListening, stopListening, clearTouches };
 };
